@@ -6,6 +6,7 @@
   bottom: 0;
   -webkit-perspective: 400;
           perspective: 400;
+  z-index: 1;
 }
 
 .plane {
@@ -21,6 +22,7 @@
   right: 0;
   bottom: 0;
   margin: auto;
+  z-index: 2;
   -webkit-transform: rotateX(60deg) rotateZ(-30deg);
           transform: rotateX(60deg) rotateZ(-30deg);
   -webkit-animation: rotate 5s infinite linear;
@@ -35,6 +37,7 @@
   border-radius: 100%;
   box-sizing: border-box;
   box-shadow: 0 0 60px #00ccff, inset 0 0 60px #00ccff;
+  z-index: 3;
 }
 .plane.main .circle::before, .plane.main .circle::after {
   content: "";
@@ -51,6 +54,7 @@
   background: #00ccff;
   box-sizing: border-box;
   box-shadow: 0 0 60px 2px #00ccff;
+  z-index: 3;
 }
 .plane.main .circle::before {
   -webkit-transform: translateZ(-90px);
@@ -101,4 +105,13 @@
     -webkit-transform: rotateX(360deg) rotateY(360deg) rotateZ(360deg);
             transform: rotateX(360deg) rotateY(360deg) rotateZ(360deg);
   }
+}
+
+.star .ear {
+  color: #fff;
+  margin: 0 auto;
+  margin-top: 55%;
+  font-size: 14px;
+  width: 500px;
+  text-align: center;
 }
