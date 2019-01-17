@@ -6,7 +6,8 @@ export class Star extends Component {
         super(props);
         this.state = {
             age: 2,
-            transcript: ""
+            transcript: "",
+            speed: 5
         };
 
         let that = this;
@@ -29,8 +30,27 @@ export class Star extends Component {
             let finalResult = results[pos];
             console.log(results, finalResult);
             this.setState({
-                transcript: finalResult[finalResult.length-1].transcript
+                transcript: finalResult[finalResult.length-1].transcript.trim()
             });
+
+            this.understandSpeech();
+        }
+    }
+
+    understandSpeech() {
+        var speech = this.state.transcript;
+
+        if (speech === "go faster") {
+            this.starExcited();
+        }
+        else if (speech === "go slower") {
+            this.starSad();
+        }
+        else if (speech === "sleep") {
+            this.starSleep();
+        }
+        else {
+            this.starNormal();
         }
     }
 
@@ -50,11 +70,31 @@ export class Star extends Component {
         return circles;
     }
 
+    starSleep() {
+        document.getElementById("star-main").style.webkitAnimation = "rotate 100s infinite linear";
+        document.getElementById("star-main").style.animation = "rotate 100s infinite linear";
+    }
+
+    starExcited() {
+        document.getElementById("star-main").style.webkitAnimation = "rotate 1s infinite linear";
+        document.getElementById("star-main").style.animation = "rotate 1s infinite linear";
+    }
+
+    starSad() {
+        document.getElementById("star-main").style.webkitAnimation = "rotate 20s infinite linear";
+        document.getElementById("star-main").style.animation = "rotate 20s infinite linear";
+    }
+
+    starNormal() {
+        document.getElementById("star-main").style.webkitAnimation = "rotate 5s infinite linear";
+        document.getElementById("star-main").style.animation = "rotate 5s infinite linear";
+    }
+
     render() {
         return (
             <div className="star">
                 <div className="view">
-                    <div className="plane main">
+                    <div className="plane main" id="star-main">
                         {
                             this.createCircles()
                         }
