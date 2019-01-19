@@ -7,7 +7,8 @@ export class Star extends Component {
         this.state = {
             age: 2,
             transcript: "",
-            speed: 5
+            speed: 5,
+            listening: true
         };
 
         let that = this;
@@ -28,7 +29,7 @@ export class Star extends Component {
 
         if (pos !== null) {
             let finalResult = results[pos];
-            console.log(results, finalResult);
+            
             this.setState({
                 transcript: finalResult[finalResult.length-1].transcript.trim()
             });
@@ -37,20 +38,36 @@ export class Star extends Component {
         }
     }
 
+    startListening() {
+        this.setState({
+            listening: true
+        });
+
+        this.starNormal();
+    }
+
+    stopListening() {
+        this.setState({
+            listening: false
+        });
+
+        this.starSleep();
+    }
+
     understandSpeech() {
         var speech = this.state.transcript;
-
-        if (speech === "go faster") {
-            this.starExcited();
-        }
-        else if (speech === "go slower") {
-            this.starSad();
-        }
-        else if (speech === "sleep") {
-            this.starSleep();
+        if (!this.state.listening) {
+            if (speech.indexOf("start listening") !== -1) {
+                this.startListening();
+            }
         }
         else {
-            this.starNormal();
+            if (speech.indexOf("stop listening") !== -1) {
+                this.stopListening();
+            }
+            else {
+                //ajax calls
+            }
         }
     }
 
