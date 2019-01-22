@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
+import { Button } from 'antd';
+import axios from 'axios';
+import "antd/dist/antd.css";
 import './responsiveVoice.js';
 import './Star.css';
-
-
 
 export class Star extends Component {
     constructor(props) {
@@ -16,13 +17,20 @@ export class Star extends Component {
             normalColour: "#00ccff",
             speakingColour: "#ffa500",
             excitedColour: "#fff237",
-            sleepColour: "#efefef"
+            sleepColour: "#efefef",
+            sadColour: "#666"
         };
 
         let that = this;
         this.props.ear.onresult = function (e) {
             that.updateTranscript(e.results);
         }
+
+        setTimeout(() => {
+            that.stopListening();
+        }, 500);
+
+        this.startListening = this.startListening.bind(this);
     }
 
     componentWillReceiveProps(nextProps) {
@@ -68,7 +76,8 @@ export class Star extends Component {
 
     startListening() {
         this.setState({
-            listening: true
+            listening: true,
+            transcript: ''
         });
 
         this.starNormal();
@@ -86,7 +95,6 @@ export class Star extends Component {
         var speech = this.state.transcript;
         if (!this.state.listening) {
             if (speech.indexOf("start listening") !== -1) {
-                this.starSpeak("hi", "wow");
                 this.startListening();
             }
         }
@@ -135,6 +143,7 @@ export class Star extends Component {
     starSad() {
         document.getElementById("star-main").style.webkitAnimation = "rotate 20s infinite linear";
         document.getElementById("star-main").style.animation = "rotate 20s infinite linear";
+        this.colourCircle(this.state.sadColour);
     }
 
     starNormal() {
@@ -185,8 +194,11 @@ export class Star extends Component {
 
     render() {
         let speech = this.state.transcript;
+        let startButton = <div className="startbutton"><Button type="primary" style={{display: "none"}} onClick={() => this.startListening}>Start listening</Button></div>;
+
         if (!this.state.listening) {
             speech = '';    
+            startButton = <div className="startbutton"><Button type="primary" onClick={this.startListening}>Start listening</Button></div>;
         }
 
         return (
@@ -199,6 +211,7 @@ export class Star extends Component {
                     </div>
                 </div>
                 <div className="ear">{speech}</div>
+                {startButton}
             </div>
         );
     }
