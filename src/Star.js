@@ -1,5 +1,8 @@
 import React, { Component } from 'react';
+import './responsiveVoice.js';
 import './Star.css';
+
+
 
 export class Star extends Component {
     constructor(props) {
@@ -8,12 +11,37 @@ export class Star extends Component {
             age: 2,
             transcript: "",
             speed: 5,
-            listening: true
+            listening: true,
+            history: [],
+            normalColour: "#00ccff",
+            speakingColour: "#ffa500",
+            excitedColour: "#fff237",
+            sleepColour: "#efefef"
         };
 
         let that = this;
         this.props.ear.onresult = function (e) {
             that.updateTranscript(e.results);
+        }
+    }
+
+    componentWillReceiveProps(nextProps) {
+        let that = this;
+
+        nextProps.ear.onresult = function (e) {
+            that.updateTranscript(e.results);
+        };
+    }
+
+    rememberSpeech() {
+        let speech = this.state.transcript;
+        let history = this.state.history;
+
+        if (speech !== history[history.length - 1]) {
+            history.push(speech);
+            this.setState({
+                history: history
+            });
         }
     }
 
@@ -29,7 +57,7 @@ export class Star extends Component {
 
         if (pos !== null) {
             let finalResult = results[pos];
-            
+        
             this.setState({
                 transcript: finalResult[finalResult.length-1].transcript.trim()
             });
@@ -58,24 +86,29 @@ export class Star extends Component {
         var speech = this.state.transcript;
         if (!this.state.listening) {
             if (speech.indexOf("start listening") !== -1) {
+                this.starSpeak("hi", "wow");
                 this.startListening();
             }
         }
         else {
             if (speech.indexOf("stop listening") !== -1) {
+                this.starSpeak("Sure", "stop");
                 this.stopListening();
             }
             else {
-                //ajax calls
+                if (speech.indexOf("are you happy") !== -1) {
+                    this.starExcited();
+                }
+                else if (speech.indexOf("are you sad") !== -1) {
+                    this.starSad();
+                }
+                else {
+                    this.starNormal();
+                    this.starSpeak(speech);
+                    //ajax calls
+                }
             }
         }
-    }
-
-    componentWillReceiveProps(nextProps) {
-        let that = this;
-        nextProps.ear.onresult = function (e) {
-            that.updateTranscript(e.results);
-        };
     }
 
     createCircles() {
@@ -90,11 +123,13 @@ export class Star extends Component {
     starSleep() {
         document.getElementById("star-main").style.webkitAnimation = "rotate 100s infinite linear";
         document.getElementById("star-main").style.animation = "rotate 100s infinite linear";
+        this.colourCircle(this.state.sleepColour);
     }
 
     starExcited() {
         document.getElementById("star-main").style.webkitAnimation = "rotate 1s infinite linear";
         document.getElementById("star-main").style.animation = "rotate 1s infinite linear";
+        this.colourCircle(this.state.excitedColour);
     }
 
     starSad() {
@@ -105,9 +140,55 @@ export class Star extends Component {
     starNormal() {
         document.getElementById("star-main").style.webkitAnimation = "rotate 5s infinite linear";
         document.getElementById("star-main").style.animation = "rotate 5s infinite linear";
+        this.colourCircle(this.state.normalColour);
+    }
+
+    starSpeaking() {
+        this.colourCircle(this.state.speakingColour);
+    }
+
+    colourCircle(colour) {
+        let circles = document.getElementsByClassName("circle");
+        for (let i = 0; i < circles.length; i++) {
+            let circle = circles[i];
+            circle.style.boxShadow = "0 0 60px " + colour + ", inset 0 0 60px " + colour;
+        }
+    }
+
+    starSpeak(speech, callback) {
+        if (speech !== "") {
+            if (speech !== this.state.history[this.state.history.length - 1]) {
+                this.starSpeaking();
+                this.setState({
+                    listening: false
+                });
+                window.responsiveVoice.speak(speech);
+
+                this.rememberSpeech();
+
+                let that = this;
+                
+                if (typeof callback === 'undefined') {
+                    setTimeout(() => {
+                        that.setState({
+                            listening: true
+                        });
+                        that.starNormal();
+                    }, 2000);
+                }
+                else {
+                    return callback;
+                }
+            }
+        }
     }
 
     render() {
+        let speech = this.state.transcript;
+        if (!this.state.listening) {
+            speech = '';    
+        }
+
         return (
             <div className="star">
                 <div className="view">
@@ -117,7 +198,7 @@ export class Star extends Component {
                         }
                     </div>
                 </div>
-                <div className="ear">{this.state.transcript}</div>
+                <div className="ear">{speech}</div>
             </div>
         );
     }
